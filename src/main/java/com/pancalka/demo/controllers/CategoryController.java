@@ -2,9 +2,9 @@ package com.pancalka.demo.controllers;
 
 import com.pancalka.demo.domain.Category;
 import com.pancalka.demo.repository.CategoryRepository;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
+import org.reactivestreams.Publisher;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,5 +24,12 @@ public class CategoryController {
     @GetMapping("/api/v1/categories/{id}")
     Mono<Category> getById(@PathVariable String id) {
         return categoryRepository.findById(id);
+    }
+
+    @PostMapping("/api/v1/categories")
+    @ResponseStatus(HttpStatus.CREATED)
+    Mono<Void> create (@RequestBody Publisher<Category> categoryStream) {
+        return categoryRepository.saveAll(categoryStream).then();
+
     }
 }

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.reactivestreams.Publisher;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -49,5 +50,20 @@ public class CategoryControllerTest {
                 .uri("/api/v1/categories/test")
                 .exchange()
                 .expectBodyList(Category.class);
+    }
+
+    @Test
+    public void shouldCreateCategory() {
+        given(categoryRepository.saveAll(any(Publisher.class)))
+                .willReturn(Flux.just(Category.builder().build()));
+
+        Mono<Category> monoCategory = Mono.just(Category.builder().description("test").build());
+
+        webTestClient.post()
+                .uri("/api/v1/categories")
+                .body(monoCategory,Category.class)
+                .exchange()
+                .expectStatus()
+                .isCreated();
     }
 }
