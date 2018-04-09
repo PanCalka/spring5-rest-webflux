@@ -13,6 +13,7 @@ import reactor.core.publisher.Mono;
 
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 
 public class CategoryControllerTest {
@@ -66,4 +67,39 @@ public class CategoryControllerTest {
                 .expectStatus()
                 .isCreated();
     }
+
+    @Test
+    public void shouldUpdateCategory() {
+        given(categoryRepository.save(any(Category.class)))
+                .willReturn(Mono.just(Category.builder().build()));
+
+        Mono<Category> monoCategory = Mono.just(Category.builder().description("someCat").build());
+
+        webTestClient.put()
+                .uri("/api/v1/categories/test")
+                .body(monoCategory,Category.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
+    @Test
+    public void shouldPatchCategory() {
+        given(categoryRepository.save(any(Category.class)))
+                .willReturn(Mono.just(Category.builder().build()));
+
+        given(categoryRepository.findById(anyString()))
+                .willReturn(Mono.just(Category.builder().build()));
+
+        Mono<Category> monoCategory = Mono.just(Category.builder().description("someCat").build());
+
+        webTestClient.patch()
+                .uri("/api/v1/categories/test")
+                .body(monoCategory,Category.class)
+                .exchange()
+                .expectStatus()
+                .isOk();
+    }
+
+
 }

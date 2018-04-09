@@ -32,4 +32,21 @@ public class CategoryController {
         return categoryRepository.saveAll(categoryStream).then();
 
     }
+
+    @PutMapping("/api/v1/categories/{id}")
+    Mono<Category> update(@PathVariable String id, @RequestBody Category category) {
+        category.setId(id);
+        return categoryRepository.save(category);
+    }
+
+    @PatchMapping("/api/v1/categories/{id}")
+    Mono<Category> patch(@PathVariable String id, @RequestBody Category category) {
+        Category categoryById = categoryRepository.findById(id).block();
+        if (categoryById.getDescription() != category.getDescription()) {
+            categoryById.setDescription(category.getDescription());
+            return categoryRepository.save(categoryById);
+        }
+        return Mono.just(categoryById);
+
+    }
 }
